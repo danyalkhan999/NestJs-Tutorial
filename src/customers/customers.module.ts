@@ -3,6 +3,7 @@ import { CustomerController } from './controllers/customer/customer.controller';
 import { CustomersService } from './services/customers/customers.service';
 import { ValidateCustomerMiddleware } from './middlewares/validate-customers.middleware';
 import { ValidateCustomerAccountMiddleware } from './middlewares/validate-customer-account.middleware';
+import { NextFunction } from 'express';
 
 @Module({
   controllers: [CustomerController],
@@ -11,7 +12,10 @@ import { ValidateCustomerAccountMiddleware } from './middlewares/validate-custom
 export class CustomersModule implements NestModule {
     configure(consumer: MiddlewareConsumer) {
       consumer
-        .apply(ValidateCustomerMiddleware)
+        .apply(ValidateCustomerMiddleware, (req: Request, res: Response, next: NextFunction) => {
+          console.log("Function type middleware.");
+          next();
+        })
         // for particular routes
         // .forRoutes(
         //   {path: 'customer/search/:id', method : RequestMethod.GET},
@@ -26,5 +30,6 @@ export class CustomersModule implements NestModule {
         .apply(ValidateCustomerAccountMiddleware)
         .exclude({path: 'customer/create', method: RequestMethod.POST})
         .forRoutes(CustomerController)
+
     }
 }
